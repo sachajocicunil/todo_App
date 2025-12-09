@@ -1,9 +1,23 @@
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<persistence xmlns="https://jakarta.ee/xml/ns/persistence"
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence version="3.0" xmlns="https://jakarta.ee/xml/ns/persistence"
              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-             xsi:schemaLocation="https://jakarta.ee/xml/ns/persistence https://jakarta.ee/xml/ns/persistence/persistence_3_2.xsd"
-             version="3.2">
-    <persistence-unit name="default">
+             xsi:schemaLocation="https://jakarta.ee/xml/ns/persistence https://jakarta.ee/xml/ns/persistence/persistence_3_0.xsd">
 
+    <persistence-unit name="todoPU" transaction-type="JTA">
+
+        <jta-data-source>jdbc/todoDS</jta-data-source>
+
+
+        <class>com.libraryapp.todoapp.Task</class>
+
+        <properties>
+            <property name="eclipselink.ddl-generation" value="drop-and-create-tables"/>
+
+            <property name="eclipselink.ddl-generation.output-mode" value="database"/>
+
+            <property name="eclipselink.logging.level" value="FINE"/>
+        </properties>
     </persistence-unit>
 </persistence>
+
+

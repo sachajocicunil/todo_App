@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+<h:head>
+    <title>Simple Todo</title>
+</h:head>
+<h:body>
+
+    <h1>Ma Liste de Tâches</h1>
+
+    <h:form>
+        <h:outputLabel value="Nouvelle tâche : " />
+        <h:inputText value="#{todoController.newTask.title}" />
+
+        <h:commandButton value="Ajouter" action="#{todoController.addTask}" />
+    </h:form>
+
+    <hr/>
+
+    <h:dataTable value="#{todoController.tasks}" var="t" border="1">
+
+        <h:column>
+            <f:facet name="header">ID</f:facet>
+            #{t.id}
+        </h:column>
+
+        <h:column>
+            <f:facet name="header">Titre</f:facet>
+            #{t.title}
+        </h:column>
+
+        <h:column>
+            <f:facet name="header">État</f:facet>
+            #{t.done ? 'Terminé' : 'À faire'}
+        </h:column>
+
+    </h:dataTable>
+
+</h:body>
+</html>
