@@ -7,8 +7,8 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import java.util.List;
 
-@ApplicationScoped
-class TaskService {
+@Stateless
+public class TaskService {
 
     @PersistenceContext(unitName = "todoPU") // Connecte à la base de données
     private EntityManager em;
@@ -39,6 +39,14 @@ class TaskService {
         Task task = find(id);
         if (task != null) {
             em.remove(task);
+        }
+    }
+
+    public void toggleTaskStatus(Long id) {
+        Task task = find(id);
+        if (task != null) {
+            task.setDone(!task.isDone());
+            em.merge(task);
         }
     }
 }

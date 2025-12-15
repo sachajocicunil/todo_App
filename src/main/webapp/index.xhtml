@@ -18,24 +18,44 @@
 
     <hr/>
 
-    <h:dataTable value="#{todoController.tasks}" var="t" border="1">
+    <h:form>
+        <h:dataTable value="#{todoController.tasks}" var="t" border="1">
 
-        <h:column>
-            <f:facet name="header">ID</f:facet>
-            #{t.id}
-        </h:column>
+            <h:column>
+                <f:facet name="header">ID</f:facet>
+                #{t.id}
+            </h:column>
 
-        <h:column>
-            <f:facet name="header">Titre</f:facet>
-            #{t.title}
-        </h:column>
+            <h:column>
+                <f:facet name="header">Titre</f:facet>
+                <h:panelGroup rendered="#{todoController.isEditing(t.id)}">
+                    <h:inputText value="#{todoController.taskToEdit.title}" size="30" />
+                </h:panelGroup>
+                <h:panelGroup rendered="#{!todoController.isEditing(t.id)}">
+                    <h:outputText value="#{t.title}" />
+                </h:panelGroup>
+            </h:column>
 
-        <h:column>
-            <f:facet name="header">État</f:facet>
-            #{t.done ? 'Terminé' : 'À faire'}
-        </h:column>
+            <h:column>
+                <f:facet name="header">État</f:facet>
+                #{t.done ? 'Terminé' : 'À faire'}
+            </h:column>
 
-    </h:dataTable>
+            <h:column>
+                <f:facet name="header">Actions</f:facet>
+                <h:panelGroup rendered="#{todoController.isEditing(t.id)}">
+                    <h:commandButton value="Sauvegarder" action="#{todoController.saveTask}" />
+                    <h:commandButton value="Annuler" action="#{todoController.cancelEdit}" immediate="true" />
+                </h:panelGroup>
+                <h:panelGroup rendered="#{!todoController.isEditing(t.id)}">
+                    <h:commandButton value="Modifier" action="#{todoController.edit(t.id)}" />
+                    <h:commandButton value="Supprimer" action="#{todoController.deleteTask(t.id)}" />
+                    <h:commandButton value="Changer État" action="#{todoController.toggleTaskStatus(t.id)}" />
+                </h:panelGroup>
+            </h:column>
+
+        </h:dataTable>
+    </h:form>
 
 </h:body>
 </html>
