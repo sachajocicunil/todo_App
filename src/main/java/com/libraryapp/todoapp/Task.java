@@ -2,6 +2,7 @@ package com.libraryapp.todoapp;
 
 import jakarta.persistence.*;
 import java.io.Serializable;
+import com.libraryapp.todoapp.User;
 
 // 1. @Entity indique à JPA que cette classe correspond à une table en base de données [cite: 382]
 @Entity
@@ -21,6 +22,11 @@ public class Task implements Serializable {
     private String description;
 
     private boolean done;
+
+    // Relation: many tasks belong to one user
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User user;
 
     // 3. Constructeur vide : OBLIGATOIRE pour JPA (le framework en a besoin pour instancier l'objet)
     public Task() {
@@ -62,5 +68,13 @@ public class Task implements Serializable {
 
     public void setDone(boolean done) {
         this.done = done;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
     }
 }

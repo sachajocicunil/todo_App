@@ -5,27 +5,42 @@ import jakarta.ejb.Singleton;
 import jakarta.ejb.Startup;
 import jakarta.inject.Inject;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Singleton // Dit au serveur : "Il n'y a qu'une seule instance de cette classe"
 @Startup   // Dit au serveur : "Lance cette classe dès que l'app est déployée"
 public class DataInitializer {
 
     @Inject
     private TaskService taskService; // On utilise ton service pour parler à la base
+    @Inject
+    private UserService userService;
 
-    @PostConstruct // Cette méthode s'exécute toute seule juste après l'injection
+    @PostConstruct
     public void init() {
+        // 1. CRÉER l'utilisateur en premier pour qu'il ait un ID (Primary Key)
+        User u1 = new User();
+        u1.setEmail("test@gmail.com");
+        u1.setPassword("123");
+        userService.create(u1); // L'utilisateur est maintenant dans la base et a un ID
+
+        // 2. CRÉER les tâches et ASSIGNER l'utilisateur (setting the Foreign Key)
+
         // Tâche 1
         Task t1 = new Task();
         t1.setTitle("Réussir l'examen SoftArch");
         t1.setDescription("Revoir les diagrammes et le code JSF");
         t1.setDone(false);
-        taskService.create(t1);
+        t1.setUser(u1); // 👈 Associe la tâche à l'utilisateur
+        taskService.create(t1); // Enregistre t1 dans la base avec l'ID de u1 (FK)
 
         // Tâche 2
         Task t2 = new Task();
         t2.setTitle("Faire les courses");
         t2.setDescription("Pain, Lait, Café");
-        t2.setDone(true); // Celle-ci sera marquée comme terminée
+        t2.setDone(true);
+        t2.setUser(u1); // 👈 Associe la tâche à l'utilisateur
         taskService.create(t2);
 
         // Tâche 3
@@ -33,8 +48,19 @@ public class DataInitializer {
         t3.setTitle("Sport");
         t3.setDescription("Séance de 1h à la salle");
         t3.setDone(false);
+        t3.setUser(u1); // 👈 Associe la tâche à l'utilisateur
         taskService.create(t3);
 
+        // 3. Mettre à jour l'utilisateur si la relation est bidirectionnelle (Optionnel)
+        // C'est nécessaire si vous voulez que u1.getTasks() renvoie ces tâches immédiatement
+        // et que vous n'utilisez pas de Cascade ou de MappedBy.
+        List<Task> tasks = new ArrayList<>();
+        tasks.add(t1);
+        tasks.add(t2);
+        tasks.add(t3);
+
+        u1.setTasks(tasks);
+        userService.update(u1); // Appel de la mise à jour (nécessite une méthode update dans userService)
+
         System.out.println("--- 🚀 DONNÉES INITIALISÉES AVEC SUCCÈS ---");
-    }
-}
+    }}

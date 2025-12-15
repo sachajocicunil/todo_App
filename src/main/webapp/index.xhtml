@@ -10,8 +10,17 @@
     <h1>Ma Liste de Tâches</h1>
 
     <h:form>
-        <h:outputLabel value="Nouvelle tâche : " />
-        <h:inputText value="#{todoController.newTask.title}" />
+        <h:panelGrid columns="2">
+            <h:outputLabel for="taskTitle" value="Nouvelle tâche : " />
+            <h:inputText id="taskTitle" value="#{todoController.newTask.title}" />
+
+            <h:outputLabel for="taskUser" value="Utilisateur : " />
+            <h:selectOneMenu id="taskUser" value="#{todoController.selectedUserId}">
+                <f:selectItem itemLabel="(aucun)" itemValue="" />
+                <f:selectItems value="#{userController.users}" var="u"
+                               itemValue="#{u.id}" itemLabel="#{u.email}" />
+            </h:selectOneMenu>
+        </h:panelGrid>
 
         <h:commandButton value="Ajouter" action="#{todoController.addTask}" />
     </h:form>
@@ -42,6 +51,11 @@
             </h:column>
 
             <h:column>
+                <f:facet name="header">Utilisateur</f:facet>
+                #{t.user != null ? t.user.email : '(aucun)'}
+            </h:column>
+
+            <h:column>
                 <f:facet name="header">Actions</f:facet>
                 <h:panelGroup rendered="#{todoController.isEditing(t.id)}">
                     <h:commandButton value="Sauvegarder" action="#{todoController.saveTask}" />
@@ -54,6 +68,42 @@
                 </h:panelGroup>
             </h:column>
 
+        </h:dataTable>
+    </h:form>
+
+    <hr/>
+
+    <h1>Utilisateurs</h1>
+
+    <h:form>
+        <h:panelGrid columns="2">
+            <h:outputLabel for="email" value="Email :" />
+            <h:inputText id="email" value="#{userController.newUser.email}" />
+
+            <h:outputLabel for="password" value="Mot de passe :" />
+            <h:inputSecret id="password" value="#{userController.newUser.password}" />
+        </h:panelGrid>
+        <h:commandButton value="Ajouter l'utilisateur" action="#{userController.addUser}" />
+    </h:form>
+
+    <h:form>
+        <h:dataTable value="#{userController.users}" var="u" border="1">
+            <h:column>
+                <f:facet name="header">ID</f:facet>
+                #{u.id}
+            </h:column>
+            <h:column>
+                <f:facet name="header">Email</f:facet>
+                #{u.email}
+            </h:column>
+            <h:column>
+                <f:facet name="header">Mot de passe (clair)</f:facet>
+                #{u.password}
+            </h:column>
+            <h:column>
+                <f:facet name="header">Actions</f:facet>
+                <h:commandButton value="Supprimer" action="#{userController.deleteUser(u.id)}" />
+            </h:column>
         </h:dataTable>
     </h:form>
 

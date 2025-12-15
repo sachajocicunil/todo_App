@@ -5,6 +5,7 @@ import jakarta.ejb.Stateless;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.TypedQuery;
 import java.util.List;
 
 @Stateless
@@ -27,6 +28,12 @@ public class TaskService {
     public List<Task> findAll() {
         // JPQL (Java Persistence Query Language) - standard pour récupérer des listes
         return em.createQuery("SELECT t FROM Task t", Task.class).getResultList();
+    }
+
+    public List<Task> findByUser(Long userId) {
+        TypedQuery<Task> q = em.createQuery("SELECT t FROM Task t WHERE t.user.id = :uid", Task.class);
+        q.setParameter("uid", userId);
+        return q.getResultList();
     }
 
     // UPDATE : Équivalent de em.merge() vu dans l'examen [cite: 430]
