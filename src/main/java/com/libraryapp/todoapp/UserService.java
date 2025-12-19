@@ -31,6 +31,10 @@ public class UserService {
     public void delete(Long id) {
         User u = find(id);
         if (u != null) {
+            // Supprimer d'abord toutes les tâches liées à cet utilisateur
+            em.createQuery("DELETE FROM Task t WHERE t.userId = :uid")
+                    .setParameter("uid", id)
+                    .executeUpdate();
             em.remove(u);
         }
     }

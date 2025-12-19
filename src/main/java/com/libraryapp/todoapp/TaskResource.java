@@ -26,8 +26,12 @@ public class TaskResource {
     @GET
     @Path("/{id}") // URL : /api/tasks/1
     @Produces(MediaType.APPLICATION_JSON)
-    public Task getTask(@PathParam("id") Long id) {
-        return taskService.find(id);
+    public Response getTask(@PathParam("id") Long id) {
+        Task t = taskService.find(id);
+        if (t == null) {
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
+        return Response.ok(t).build();
     }
 
     // --- CREATE (Ajouter une tâche) ---
@@ -35,8 +39,20 @@ public class TaskResource {
     @POST
     @Consumes(MediaType.APPLICATION_JSON) // On reçoit du JSON
     @Produces(MediaType.APPLICATION_JSON) // On renvoie la tâche créée (avec son ID généré)
-    public Task createTask(Task task) {
-        return taskService.create(task);
+    public Response createTask(@jakarta.ws.rs.core.Context jakarta.ws.rs.core.UriInfo uriInfo, Task task) {
+        if (task == null || task.getUserId() == null) {
+            throw new BadRequestException("La tâche doit être associée à un utilisateur (userId obligatoire).");
+        }
+        try {
+            Task created = taskService.create(task);
+            java.net.URI location = uriInfo.getAbsolutePathBuilder().path(String.valueOf(created.getId())).build();
+            return Response.created(location).entity(created).build();
+        } catch (IllegalArgumentException ex) {
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .entity(ex.getMessage())
+                    .type(MediaType.TEXT_PLAIN)
+                    .build();
+        }
     }
 
     // --- UPDATE (Mettre à jour une tâche) ---
@@ -45,20 +61,42 @@ public class TaskResource {
     @Path("/{id}")
     @Consumes(MediaType.APPLICATION_JSON)
     public Response updateTask(@PathParam("id") Long id, Task task) {
-        // Petite sécurité : on s'assure que l'ID de l'URL correspond à l'objet
-        if (taskService.find(id) == null) {
+        Task existing = taskService.find(id);
+        if (existing == null) {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
-        // Note: Dans l'examen, la méthode setTeacher prenait username + teacher
-        taskService.update(task);
-        return Response.ok().build();
+        if (task == null || task.getUserId() == null) {
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .entity("La tâche doit être associée à un utilisateur (userId obligatoire).")
+                    .type(MediaType.TEXT_PLAIN)
+                    .build();
+        }
+        try {
+            // Met à jour les champs autorisés
+            existing.setTitle(task.getTitle());
+            existing.setDescription(task.getDescription());
+            existing.setDone(task.isDone());
+            existing.setUserId(task.getUserId());
+            Task updated = taskService.update(existing);
+            return Response.ok(updated).build();
+        } catch (IllegalArgumentException ex) {
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .entity(ex.getMessage())
+                    .type(MediaType.TEXT_PLAIN)
+                    .build();
+        }
     }
 
     // --- DELETE (Supprimer une tâche) ---
     // Correspond à OQ1 Q5 "Delete: removeTeacher"
     @DELETE
     @Path("/{id}")
-    public void deleteTask(@PathParam("id") Long id) {
+    public Response deleteTask(@PathParam("id") Long id) {
+        Task existing = taskService.find(id);
+        if (existing == null) {
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
         taskService.delete(id);
+        return Response.noContent().build();
     }
 }

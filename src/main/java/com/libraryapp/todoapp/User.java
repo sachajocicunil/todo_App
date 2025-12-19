@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import jakarta.json.bind.annotation.JsonbTransient;
 
 @Entity
 @Table(name = "users")
@@ -21,9 +22,7 @@ public class User implements Serializable {
     @Column(nullable = false)
     private String password;
 
-    // Un utilisateur peut avoir plusieurs tâches
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Task> tasks = new ArrayList<>();
+    // La relation forte avec Task est supprimée: on garde un modèle simple côté User
 
     public User() {
     }
@@ -53,26 +52,5 @@ public class User implements Serializable {
         this.password = password;
     }
 
-    public List<Task> getTasks() {
-        return tasks;
-    }
-
-    public void setTasks(List<Task> tasks) {
-        this.tasks = tasks;
-    }
-
-    // Helpers pour gérer la relation bidirectionnelle
-    public void addTask(Task task) {
-        if (task == null) return;
-        tasks.add(task);
-        task.setUser(this);
-    }
-
-    public void removeTask(Task task) {
-        if (task == null) return;
-        tasks.remove(task);
-        if (task.getUser() == this) {
-            task.setUser(null);
-        }
-    }
+    // Plus de getter/setter de liste de tâches ici pour éviter la dépendance forte
 }

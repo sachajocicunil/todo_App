@@ -16,6 +16,13 @@ public class TaskService {
 
     // CREATE : Équivalent de em.persist() vu dans l'examen [cite: 420]
     public Task create(Task task) {
+        if (task == null || task.getUserId() == null) {
+            throw new IllegalArgumentException("La tâche doit être associée à un utilisateur (userId non nul).");
+        }
+        // Validation référentielle applicative: le userId doit exister
+        if (em.find(User.class, task.getUserId()) == null) {
+            throw new IllegalArgumentException("Utilisateur inexistant pour userId=" + task.getUserId());
+        }
         em.persist(task);
         return task;
     }
@@ -31,13 +38,20 @@ public class TaskService {
     }
 
     public List<Task> findByUser(Long userId) {
-        TypedQuery<Task> q = em.createQuery("SELECT t FROM Task t WHERE t.user.id = :uid", Task.class);
+        TypedQuery<Task> q = em.createQuery("SELECT t FROM Task t WHERE t.userId = :uid", Task.class);
         q.setParameter("uid", userId);
         return q.getResultList();
     }
 
     // UPDATE : Équivalent de em.merge() vu dans l'examen [cite: 430]
     public Task update(Task task) {
+        if (task == null || task.getUserId() == null) {
+            throw new IllegalArgumentException("La tâche doit être associée à un utilisateur (userId non nul).");
+        }
+        // Validation référentielle applicative: le userId doit exister
+        if (em.find(User.class, task.getUserId()) == null) {
+            throw new IllegalArgumentException("Utilisateur inexistant pour userId=" + task.getUserId());
+        }
         return em.merge(task);
     }
 

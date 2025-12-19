@@ -14,7 +14,7 @@ public class TodoController implements Serializable {
     private transient TaskService taskService; // On relie notre Service créé à l'étape précédente
 
     @Inject
-    private transient UserService userService; // Pour lier une tâche à un utilisateur
+    private transient UserService userService; // Conservé pour charger la liste des utilisateurs côté UI
 
     private Task newTask = new Task(); // L'objet vide pour le formulaire
     private List<Task> tasks; // La liste pour l'affichage
@@ -32,10 +32,7 @@ public class TodoController implements Serializable {
     // Méthode appelée par le bouton "Ajouter"
     public String addTask() {
         if (selectedUserId != null) {
-            User u = userService.find(selectedUserId);
-            if (u != null) {
-                newTask.setUser(u);
-            }
+            newTask.setUserId(selectedUserId);
         }
         taskService.create(newTask); // Sauvegarde en base
         newTask = new Task(); // Reset du formulaire

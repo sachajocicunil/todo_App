@@ -16,7 +16,6 @@
 
             <h:outputLabel for="taskUser" value="Utilisateur : " />
             <h:selectOneMenu id="taskUser" value="#{todoController.selectedUserId}">
-                <f:selectItem itemLabel="(aucun)" itemValue="" />
                 <f:selectItems value="#{userController.users}" var="u"
                                itemValue="#{u.id}" itemLabel="#{u.email}" />
             </h:selectOneMenu>
@@ -51,8 +50,8 @@
             </h:column>
 
             <h:column>
-                <f:facet name="header">Utilisateur</f:facet>
-                #{t.user != null ? t.user.email : '(aucun)'}
+                <f:facet name="header">Utilisateur (ID)</f:facet>
+                #{t.userId}
             </h:column>
 
             <h:column>

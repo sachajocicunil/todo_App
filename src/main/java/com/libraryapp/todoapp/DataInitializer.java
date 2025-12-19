@@ -25,14 +25,14 @@ public class DataInitializer {
         u1.setPassword("123");
         userService.create(u1); // L'utilisateur est maintenant dans la base et a un ID
 
-        // 2. CRÉER les tâches et ASSIGNER l'utilisateur (setting the Foreign Key)
+        // 2. CRÉER les tâches et ASSIGNER l'utilisateur par son ID (FK simple)
 
         // Tâche 1
         Task t1 = new Task();
         t1.setTitle("Réussir l'examen SoftArch");
         t1.setDescription("Revoir les diagrammes et le code JSF");
         t1.setDone(false);
-        t1.setUser(u1); // 👈 Associe la tâche à l'utilisateur
+        t1.setUserId(u1.getId()); // 👈 Associe la tâche à l'utilisateur par ID
         taskService.create(t1); // Enregistre t1 dans la base avec l'ID de u1 (FK)
 
         // Tâche 2
@@ -40,7 +40,7 @@ public class DataInitializer {
         t2.setTitle("Faire les courses");
         t2.setDescription("Pain, Lait, Café");
         t2.setDone(true);
-        t2.setUser(u1); // 👈 Associe la tâche à l'utilisateur
+        t2.setUserId(u1.getId()); // 👈 Associe la tâche à l'utilisateur par ID
         taskService.create(t2);
 
         // Tâche 3
@@ -48,19 +48,10 @@ public class DataInitializer {
         t3.setTitle("Sport");
         t3.setDescription("Séance de 1h à la salle");
         t3.setDone(false);
-        t3.setUser(u1); // 👈 Associe la tâche à l'utilisateur
+        t3.setUserId(u1.getId()); // 👈 Associe la tâche à l'utilisateur par ID
         taskService.create(t3);
 
-        // 3. Mettre à jour l'utilisateur si la relation est bidirectionnelle (Optionnel)
-        // C'est nécessaire si vous voulez que u1.getTasks() renvoie ces tâches immédiatement
-        // et que vous n'utilisez pas de Cascade ou de MappedBy.
-        List<Task> tasks = new ArrayList<>();
-        tasks.add(t1);
-        tasks.add(t2);
-        tasks.add(t3);
-
-        u1.setTasks(tasks);
-        userService.update(u1); // Appel de la mise à jour (nécessite une méthode update dans userService)
+        // Plus de synchronisation bidirectionnelle nécessaire
 
         System.out.println("--- 🚀 DONNÉES INITIALISÉES AVEC SUCCÈS ---");
     }}
